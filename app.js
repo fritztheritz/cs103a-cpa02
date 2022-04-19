@@ -22,6 +22,7 @@ const ToDoItem = require("./models/ToDoItem")
 const Course = require('./models/Course')
 const Schedule = require('./models/Schedule')
 const Movie = require('./models/Movie')
+const SavedMovies = require('./models/SavedMovies')
 
 // *********************************************************** //
 //  Loading JSON datasets
@@ -297,56 +298,88 @@ app.post('/courses/byKeyword',
 
 app.use(isLoggedIn)
 
-app.get('/addCourse/:courseId',
-    // add a course to the user's schedule
-    async(req, res, next) => {
-        try {
-            const courseId = req.params.courseId
-            const userId = res.locals.user._id
-                // check to make sure it's not already loaded
-            const lookup = await Schedule.find({ courseId, userId })
-            if (lookup.length == 0) {
-                const schedule = new Schedule({ courseId, userId })
-                await schedule.save()
-            }
-            res.redirect('/schedule/show')
-        } catch (e) {
-            next(e)
-        }
-    })
-
-app.get('/schedule/show',
+app.get('/movies/saved',
     // show the current user's schedule
     async(req, res, next) => {
         try {
             const userId = res.locals.user._id;
-            const courseIds =
-                (await Schedule.find({ userId }))
-                .sort(x => x.term)
-                .map(x => x.courseId)
-            res.locals.courses = await Course.find({ _id: { $in: courseIds } })
-            res.render('schedule')
+            const movieIds =
+                (await SavedMovies.find({ userId }))
+                .map(x => x.movieId)
+            res.locals.movies = await Movie.find({ _id: { $in: movieIds } })
+            res.render('savedlist')
         } catch (e) {
             next(e)
         }
     }
 )
 
-app.get('/schedule/remove/:courseId',
+app.get('/movies/remove/:movieid',
     // remove a course from the user's schedule
     async(req, res, next) => {
         try {
             await Schedule.remove({
                 userId: res.locals.user._id,
-                courseId: req.params.courseId
+                movieID: req.params.movieid
             })
-            res.redirect('/schedule/show')
+            res.redirect('/movies/show')
 
         } catch (e) {
             next(e)
         }
     }
 )
+
+// app.get('/addCourse/:courseId',
+//     // add a course to the user's schedule
+//     async(req, res, next) => {
+//         try {
+//             const courseId = req.params.courseId
+//             const userId = res.locals.user._id
+//                 // check to make sure it's not already loaded
+//             const lookup = await Schedule.find({ courseId, userId })
+//             if (lookup.length == 0) {
+//                 const schedule = new Schedule({ courseId, userId })
+//                 await schedule.save()
+//             }
+//             res.redirect('/schedule/show')
+//         } catch (e) {
+//             next(e)
+//         }
+//     })
+
+// app.get('/schedule/show',
+//     // show the current user's schedule
+//     async(req, res, next) => {
+//         try {
+//             const userId = res.locals.user._id;
+//             const courseIds =
+//                 (await Schedule.find({ userId }))
+//                 .sort(x => x.term)
+//                 .map(x => x.courseId)
+//             res.locals.courses = await Course.find({ _id: { $in: courseIds } })
+//             res.render('schedule')
+//         } catch (e) {
+//             next(e)
+//         }
+//     }
+// )
+
+// app.get('/schedule/remove/:courseId',
+//     // remove a course from the user's schedule
+//     async(req, res, next) => {
+//         try {
+//             await Schedule.remove({
+//                 userId: res.locals.user._id,
+//                 courseId: req.params.courseId
+//             })
+//             res.redirect('/schedule/show')
+
+//         } catch (e) {
+//             next(e)
+//         }
+//     }
+// )
 
 
 // here we catch 404 errors and forward to error handler

@@ -1,0 +1,14 @@
+<ul>
+	<% for (movie of movies){%>
+	    <li> 
+		<a href="/movies/remove/<%= movie._id %>">X</a>
+		<%= movie['Title'] %>
+		<%= movie.Genre %>
+		<%= movie.Description %>
+		<%= movie.Actors %>
+		<%= movie.Year %>
+		<%= movie.Runtime %>
+	    </li>
+	<% } %>
+    </ul>
+    
