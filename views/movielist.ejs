@@ -1,0 +1,35 @@
+<h1>Results</h1>
+Here is a table with the title, genre, description, actors, year, and runtime
+<hr>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Genre</th>
+            <th>Description</th>
+            <th>Actors</th>
+            <th>Year</th>
+            <th>Runtime</th>
+        </tr>
+    </thead>
+    <tbody>
+    <% for (movie of movies) { %>
+      <tr class="mb-2"> 
+        <td>
+            <a href="/movies/show/<%=movie._id %>">
+            <%= movie['Title'] %>
+            </a>
+        </td>
+	    <td><%= movie['Genre'] %></td>
+	    <td><%= movie['Description'] %></td>
+	    <td><%= movie['Actors'] %></td>
+	    <td><%= movie['Year'] %></td>
+	    <td><%= movie['Runtime'] %></td>
+    </tr>
+    <% } %>
+    </tbody>
+</table>
+
+<pre>
+        <%= JSON.stringify(movies,null,5) %> 
+</pre>

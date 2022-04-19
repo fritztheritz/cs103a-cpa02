@@ -21,11 +21,13 @@ const axios = require("axios")
 const ToDoItem = require("./models/ToDoItem")
 const Course = require('./models/Course')
 const Schedule = require('./models/Schedule')
+const Movie = require('./models/Movie')
 
 // *********************************************************** //
 //  Loading JSON datasets
 // *********************************************************** //
 const courses = require('./public/data/courses20-21.json')
+const movies = require('./public/data/movies.json')
 
 
 // *********************************************************** //
@@ -34,8 +36,8 @@ const courses = require('./public/data/courses20-21.json')
 
 const mongoose = require('mongoose');
 // const mongodb_URI = 'mongodb://localhost:27017/cs103a_todo'
-const mongodb_URI = 'mongodb+srv://cs_sj:BrandeisSpr22@cluster0.kgugl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-
+// const mongodb_URI = 'mongodb+srv://cs_sj:BrandeisSpr22@cluster0.kgugl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+const mongodb_URI = 'mongodb+srv://fritzmovie:viralmovie@cluster0.2bzuo.mongodb.net/test'
 mongoose.connect(mongodb_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 // fix deprecation warnings
 mongoose.set('useFindAndModify', false);
@@ -175,56 +177,6 @@ app.get("/todo/completed/:value/:itemId",
     }
 )
 
-/* ************************
-  Functions needed for the course finder routes
-   ************************ */
-
-function getNum(coursenum) {
-    // separate out a coursenum 103A into 
-    // a num: 103 and a suffix: A
-    i = 0;
-    while (i < coursenum.length && '0' <= coursenum[i] && coursenum[i] <= '9') {
-        i = i + 1;
-    }
-    return coursenum.slice(0, i);
-}
-
-
-function times2str(times) {
-    // convert a course.times object into a list of strings
-    // e.g ["Lecture:Mon,Wed 10:00-10:50","Recitation: Thu 5:00-6:30"]
-    if (!times || times.length == 0) {
-        return ["not scheduled"]
-    } else {
-        return times.map(x => time2str(x))
-    }
-
-}
-
-function min2HourMin(m) {
-    // converts minutes since midnight into a time string, e.g.
-    // 605 ==> "10:05"  as 10:00 is 60*10=600 minutes after midnight
-    const hour = Math.floor(m / 60);
-    const min = m % 60;
-    if (min < 10) {
-        return `${hour}:0${min}`;
-    } else {
-        return `${hour}:${min}`;
-    }
-}
-
-function time2str(time) {
-    // creates a Times string for a lecture or recitation, e.g. 
-    //     "Recitation: Thu 5:00-6:30"
-    const start = time.start
-    const end = time.end
-    const days = time.days
-    const meetingType = time['type'] || "Lecture"
-    const location = time['building'] || ""
-
-    return `${meetingType}: ${days.join(",")}: ${min2HourMin(start)}-${min2HourMin(end)} ${location}`
-}
-
 
 
 /* ************************
@@ -233,71 +185,100 @@ function time2str(time) {
 // this route loads in the courses into the Course collection
 // or updates the courses if it is not a new collection
 
-app.get('/upsertDB',
-    async(req, res, next) => {
-        //await Course.deleteMany({})
-        for (course of courses) {
-            const { subject, coursenum, section, term } = course;
-            const num = getNum(coursenum);
-            course.num = num
-            course.suffix = coursenum.slice(num.length)
-            course.strTimes = times2str(course.times)
-            await Course.findOneAndUpdate({ subject, coursenum, section, term }, course, { upsert: true })
-        }
-        const num = await Course.find({}).count();
-        res.send("data uploaded: " + num)
-    }
-)
+// app.get('/upsertDB',
+//     async(req, res, next) => {
+//         //await Course.deleteMany({})
+//         for (course of courses) {
+//             const { subject, coursenum, section, term } = course;
+//             const num = getNum(coursenum);
+//             course.num = num
+//             course.suffix = coursenum.slice(num.length)
+//             course.strTimes = times2str(course.times)
+//             await Course.findOneAndUpdate({ subject, coursenum, section, term }, course, { upsert: true })
+//         }
+//         const num = await Course.find({}).count();
+//         res.send("data uploaded: " + num)
+//     }
+// )
 
+// app.post('/courses/bySubject',
+//     // show list of courses in a given subject
+//     async(req, res, next) => {
+//         const { subject } = req.body;
+//         const courses = await Course.find({ subject: subject, independent_study: false }).sort({ term: 1, num: 1, section: 1 })
 
-app.post('/courses/bySubject',
-    // show list of courses in a given subject
-    async(req, res, next) => {
-        const { subject } = req.body;
-        const courses = await Course.find({ subject: subject, independent_study: false }).sort({ term: 1, num: 1, section: 1 })
+//         res.locals.courses = courses
+//         res.locals.strTimes = courses.strTimes
+//             //res.json(courses)
+//         res.render('courselist')
+//     }
+// )
 
-        res.locals.courses = courses
-        res.locals.strTimes = courses.strTimes
-            //res.json(courses)
-        res.render('courselist')
-    }
-)
+// app.get('/courses/show/:courseId',
+//     // show all info about a course given its courseid
+//     async(req, res, next) => {
+//         const { courseId } = req.params;
+//         const course = await Course.findOne({ _id: courseId })
+//         res.locals.course = course
+//         res.locals.strTimes = courses.strTimes
+//             //res.json(course)
+//         res.render('course')
+//     }
+// )
 
-app.get('/courses/show/:courseId',
-    // show all info about a course given its courseid
-    async(req, res, next) => {
-        const { courseId } = req.params;
-        const course = await Course.findOne({ _id: courseId })
-        res.locals.course = course
-        res.locals.strTimes = courses.strTimes
-            //res.json(course)
-        res.render('course')
-    }
-)
-
-app.get('/courses/byInst/:email',
+app.get('/movies/title/:name',
     // show a list of all courses taught by a given faculty
     async(req, res, next) => {
-        const email = req.params.email + "@brandeis.edu";
-        const courses = await Course.find({ instructor: email, independent_study: false })
+        const name = req.params.name;
+        const movies = await Movie.find({title: name})
             //res.json(courses)
-        res.locals.courses = courses
-        res.render('courselist')
+        res.locals.movies = movies
+        res.render('movielist')
     }
 )
 
-app.post('/courses/byInst',
+app.post('/movies/title',
     // show courses taught by a faculty send from a form
     async(req, res, next) => {
-        const email = req.body.email + "@brandeis.edu";
-        const courses =
-            await Course
-            .find({ instructor: email, independent_study: false })
-            .sort({ term: 1, num: 1, section: 1 })
-            //res.json(courses)
-        res.locals.courses = courses
-        res.locals.strTimes = courses.strTimes
-        res.render('courselist')
+        const { title } = req.body;
+        console.log(title);
+        console.log(typeof title);
+        const movies = await Movie.find({Title: {$regex: title}})
+        // res.json(movies)
+        res.locals.movies = movies
+        console.log(movies);
+        // console.log(typeof movies);
+        res.render('movielist', {movies: movies})
+    }
+)
+
+app.post('/movies/actor',
+    // show courses taught by a faculty send from a form
+    async(req, res, next) => {
+        const { actor } = req.body;
+        console.log(actor);
+        console.log(typeof actor);
+        const movies = await Movie.find({Actors: {$regex: actor}})
+        // res.json(movies)
+        res.locals.movies = movies
+        console.log(movies);
+        // console.log(typeof movies);
+        res.render('movielist', {movies: movies})
+    }
+)
+
+app.post('/movies/genre',
+    // show courses taught by a faculty send from a form
+    async(req, res, next) => {
+        const { genre } = req.body;
+        console.log(genre);
+        console.log(typeof genre);
+        const movies = await Movie.find({Genre: {$regex: genre}})
+        // res.json(movies)
+        res.locals.movies = movies
+        console.log(movies);
+        // console.log(typeof movies);
+        res.render('movielist', {movies: movies})
     }
 )
 
