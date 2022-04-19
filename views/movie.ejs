@@ -1,0 +1,16 @@
+<div class="bg-light m-5 p-2 border border-primary border-2">
+	<div class="">
+	    <strong><%= movie.Title %></strong>
+	</div>
+	<div class="mb-1">
+	    <%=movie.Genre %>
+	</div>
+	<div><a href="/addMovie/<%= movie['_id'] %>">(add to saved list)</a></div>
+	<div class="mb-1">
+	   Year: <%=movie.Year %>,
+	   Runtime: <%=movie.Runtime %>,
+	   Rating: <%= movie.Rating %>
+	</div>
+    
+    </div>
+    <hr>

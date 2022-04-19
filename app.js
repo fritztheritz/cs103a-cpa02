@@ -283,18 +283,29 @@ app.post('/movies/genre',
     }
 )
 
-app.post('/courses/byKeyword',
-    // show list of courses in a given subject
+app.get('/movies/show/:movieId',
+    // show all info about a course given its courseid
     async(req, res, next) => {
-        const { keyword } = req.body;
-        var regex = new RegExp(keyword, "gi")
-        const courses = await Course.find({name: regex}, {independent_study: false }).sort({ term: 1, num: 1, section: 1 })
-        res.locals.courses = courses
-        res.locals.strTimes = courses.strTimes
-            //res.json(courses)
-        res.render('courselist')
+        const { movieId } = req.params;
+        const movie = await Movie.findOne({ _id: movieId })
+        res.locals.movie = movie
+            //res.json(course)
+        res.render('movie')
     }
 )
+
+// app.post('/courses/byKeyword',
+//     // show list of courses in a given subject
+//     async(req, res, next) => {
+//         const { keyword } = req.body;
+//         var regex = new RegExp(keyword, "gi")
+//         const courses = await Course.find({name: regex}, {independent_study: false }).sort({ term: 1, num: 1, section: 1 })
+//         res.locals.courses = courses
+//         res.locals.strTimes = courses.strTimes
+//             //res.json(courses)
+//         res.render('courselist')
+//     }
+// )
 
 app.use(isLoggedIn)
 
@@ -329,6 +340,24 @@ app.get('/movies/remove/:movieid',
         }
     }
 )
+
+app.get('/addMovie/:movieid',
+    // add a course to the user's schedule
+    async(req, res, next) => {
+        try {
+            const movieId = req.params.movieid
+            const userId = res.locals.user._id
+                // check to make sure it's not already loaded
+            const lookup = await SavedMovies.find({ movieId, userId })
+            if (lookup.length == 0) {
+                const savedMovie = new SavedMovies({ movieId, userId })
+                await savedMovie.save()
+            }
+            res.redirect('/movies/saved')
+        } catch (e) {
+            next(e)
+        }
+    })
 
 // app.get('/addCourse/:courseId',
 //     // add a course to the user's schedule
