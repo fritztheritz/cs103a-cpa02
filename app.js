@@ -227,6 +227,18 @@ app.get("/todo/completed/:value/:itemId",
 //     }
 // )
 
+app.get('/upsertDB',
+    async(req, res, next) => {
+        //await Course.deleteMany({})
+        for (movie of movies) {
+            const { Title, Genre, Description, Actors } = movie;
+            await Movie.findOneAndUpdate({ Title, Genre, Description, Actors }, movie, { upsert: true })
+        }
+        const num = await Movie.find({}).count();
+        res.send("data uploaded: " + num)
+    }
+)
+
 app.get('/movies/title/:name',
     // show a list of all courses taught by a given faculty
     async(req, res, next) => {
