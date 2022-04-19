@@ -18,16 +18,14 @@ const axios = require("axios")
 // *********************************************************** //
 //  Loading models
 // *********************************************************** //
-// const ToDoItem = require("./models/ToDoItem")
-// const Course = require('./models/Course')
-// const Schedule = require('./models/Schedule')
-const Movie = require('./models/Movie')
+const ToDoItem = require("./models/ToDoItem")
+const Course = require('./models/Course')
+const Schedule = require('./models/Schedule')
 
 // *********************************************************** //
-//  Loading CSV datasets
+//  Loading JSON datasets
 // *********************************************************** //
-// const courses = require('./public/data/courses20-21.json')
-// const movies = require('./public/data/IMDB-Movie-Data.csv')
+const courses = require('./public/data/courses20-21.json')
 
 
 // *********************************************************** //
@@ -36,7 +34,7 @@ const Movie = require('./models/Movie')
 
 const mongoose = require('mongoose');
 // const mongodb_URI = 'mongodb://localhost:27017/cs103a_todo'
-const mongodb_URI = 'mongodb+srv://fritzmovie:viralmovie@cluster0.2bzuo.mongodb.net/test'
+const mongodb_URI = 'mongodb+srv://cs_sj:BrandeisSpr22@cluster0.kgugl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
 
 mongoose.connect(mongodb_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 // fix deprecation warnings
@@ -114,19 +112,154 @@ app.get("/about", (req, res, next) => {
     res.render("about");
 });
 
-// *maybe have upsertDB again*
 
 
-app.post('/movies/title',
+/*
+    ToDoList routes
+*/
+app.get('/todo',
+    isLoggedIn, // redirect to /login if user is not logged in
+    async(req, res, next) => {
+        try {
+            let userId = res.locals.user._id; // get the user's id
+            let items = await ToDoItem.find({ userId: userId }); // lookup the user's todo items
+            res.locals.items = items; //make the items available in the view
+            res.render("toDo"); // render to the toDo page
+        } catch (e) {
+            next(e);
+        }
+    }
+)
+
+app.post('/todo/add',
+    isLoggedIn,
+    async(req, res, next) => {
+        try {
+            const { title, description } = req.body; // get title and description from the body
+            const userId = res.locals.user._id; // get the user's id
+            const createdAt = new Date(); // get the current date/time
+            let data = { title, description, userId, createdAt, } // create the data object
+            let item = new ToDoItem(data) // create the database object (and test the types are correct)
+            await item.save() // save the todo item in the database
+            res.redirect('/todo') // go back to the todo page
+        } catch (e) {
+            next(e);
+        }
+    }
+)
+
+app.get("/todo/delete/:itemId",
+    isLoggedIn,
+    async(req, res, next) => {
+        try {
+            const itemId = req.params.itemId; // get the id of the item to delete
+            await ToDoItem.deleteOne({ _id: itemId }) // remove that item from the database
+            res.redirect('/todo') // go back to the todo page
+        } catch (e) {
+            next(e);
+        }
+    }
+)
+
+app.get("/todo/completed/:value/:itemId",
+    isLoggedIn,
+    async(req, res, next) => {
+        try {
+            const itemId = req.params.itemId; // get the id of the item to delete
+            const completed = req.params.value == 'true';
+            await ToDoItem.findByIdAndUpdate(itemId, { completed }) // remove that item from the database
+            res.redirect('/todo') // go back to the todo page
+        } catch (e) {
+            next(e);
+        }
+    }
+)
+
+/* ************************
+  Functions needed for the course finder routes
+   ************************ */
+
+function getNum(coursenum) {
+    // separate out a coursenum 103A into 
+    // a num: 103 and a suffix: A
+    i = 0;
+    while (i < coursenum.length && '0' <= coursenum[i] && coursenum[i] <= '9') {
+        i = i + 1;
+    }
+    return coursenum.slice(0, i);
+}
+
+
+function times2str(times) {
+    // convert a course.times object into a list of strings
+    // e.g ["Lecture:Mon,Wed 10:00-10:50","Recitation: Thu 5:00-6:30"]
+    if (!times || times.length == 0) {
+        return ["not scheduled"]
+    } else {
+        return times.map(x => time2str(x))
+    }
+
+}
+
+function min2HourMin(m) {
+    // converts minutes since midnight into a time string, e.g.
+    // 605 ==> "10:05"  as 10:00 is 60*10=600 minutes after midnight
+    const hour = Math.floor(m / 60);
+    const min = m % 60;
+    if (min < 10) {
+        return `${hour}:0${min}`;
+    } else {
+        return `${hour}:${min}`;
+    }
+}
+
+function time2str(time) {
+    // creates a Times string for a lecture or recitation, e.g. 
+    //     "Recitation: Thu 5:00-6:30"
+    const start = time.start
+    const end = time.end
+    const days = time.days
+    const meetingType = time['type'] || "Lecture"
+    const location = time['building'] || ""
+
+    return `${meetingType}: ${days.join(",")}: ${min2HourMin(start)}-${min2HourMin(end)} ${location}`
+}
+
+
+
+/* ************************
+  Loading (or reloading) the data into a collection
+   ************************ */
+// this route loads in the courses into the Course collection
+// or updates the courses if it is not a new collection
+
+app.get('/upsertDB',
+    async(req, res, next) => {
+        //await Course.deleteMany({})
+        for (course of courses) {
+            const { subject, coursenum, section, term } = course;
+            const num = getNum(coursenum);
+            course.num = num
+            course.suffix = coursenum.slice(num.length)
+            course.strTimes = times2str(course.times)
+            await Course.findOneAndUpdate({ subject, coursenum, section, term }, course, { upsert: true })
+        }
+        const num = await Course.find({}).count();
+        res.send("data uploaded: " + num)
+    }
+)
+
+
+app.post('/courses/bySubject',
     // show list of courses in a given subject
     async(req, res, next) => {
-        const { title } = req.body;
-        const movies = await Movie.find({title: title}).sort({ title: 1})
+        const { subject } = req.body;
+        const courses = await Course.find({ subject: subject, independent_study: false }).sort({ term: 1, num: 1, section: 1 })
 
-        res.locals.movies = movies
-        // res.locals.strTimes = courses.strTimes
+        res.locals.courses = courses
+        res.locals.strTimes = courses.strTimes
             //res.json(courses)
-        res.render('movieslist')
+        res.render('courselist')
     }
 )
 
