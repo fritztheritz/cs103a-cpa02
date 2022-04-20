@@ -1,16 +1,23 @@
-<div class="bg-light m-5 p-2 border border-primary border-2">
+<div class="bg-light m-5 p-2 border border-primary border-2 center" style="text-align: center; width: 50%;">
 	<div class="">
 	    <strong><%= movie.Title %></strong>
 	</div>
 	<div class="mb-1">
-	    <%=movie.Genre %>
+		<% const genre = movie['Genre'].split(","); %>
+		<% for(let j = 0; j < genre.length; j++) { %>
+		    <% if(j != genre.length - 1) { %>
+			<%= genre[j] + ", " %>
+		    <% } %>
+		    <% if(j == genre.length - 1) { %>
+			<%= genre[j] %>
+		    <% } %>
+		<% } %>
 	</div>
 	<div><a href="/addMovie/<%= movie['_id'] %>">(add to saved list)</a></div>
 	<div class="mb-1">
 	   Year: <%=movie.Year %>,
-	   Runtime: <%=movie.Runtime %>,
-	   Rating: <%= movie.Rating %>
+	   Runtime: <%=movie.Runtime %> minutes,
+	   Rating: <%= movie.Rating %> / 10
 	</div>
-    
     </div>
     <hr>
