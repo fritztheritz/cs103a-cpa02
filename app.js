@@ -231,8 +231,8 @@ app.get('/upsertDB',
     async(req, res, next) => {
         //await Course.deleteMany({})
         for (movie of movies) {
-            const { Title, Genre, Description, Actors } = movie;
-            await Movie.findOneAndUpdate({ Title, Genre, Description, Actors }, movie, { upsert: true })
+            const { Title, Genre, Description, Actors, Runtime} = movie;
+            await Movie.findOneAndUpdate({ Title, Genre, Description, Actors, Runtime }, movie, { upsert: true })
         }
         const num = await Movie.find({}).count();
         res.send("data uploaded: " + num)
@@ -256,7 +256,7 @@ app.post('/movies/title',
         const { title } = req.body;
         console.log(title);
         console.log(typeof title);
-        const movies = await Movie.find({Title: {$regex: title}})
+        const movies = await Movie.find({Title: {$regex: title}}).sort({Title: 1})
         // res.json(movies)
         res.locals.movies = movies
         console.log(movies);
@@ -271,7 +271,7 @@ app.post('/movies/actor',
         const { actor } = req.body;
         console.log(actor);
         console.log(typeof actor);
-        const movies = await Movie.find({Actors: {$regex: actor}})
+        const movies = await Movie.find({Actors: {$regex: actor}}).sort({Title: 1})
         // res.json(movies)
         res.locals.movies = movies
         console.log(movies);
@@ -286,7 +286,7 @@ app.post('/movies/genre',
         const { genre } = req.body;
         console.log(genre);
         console.log(typeof genre);
-        const movies = await Movie.find({Genre: {$regex: genre}})
+        const movies = await Movie.find({Genre: {$regex: genre}}).sort({Title: 1})
         // res.json(movies)
         res.locals.movies = movies
         console.log(movies);
@@ -341,11 +341,11 @@ app.get('/movies/remove/:movieid',
     // remove a course from the user's schedule
     async(req, res, next) => {
         try {
-            await Schedule.remove({
+            await SavedMovies.remove({
                 userId: res.locals.user._id,
-                movieID: req.params.movieid
+                movieId: req.params.movieid
             })
-            res.redirect('/movies/show')
+            res.redirect('/movies/saved')
 
         } catch (e) {
             next(e)
