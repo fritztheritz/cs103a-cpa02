@@ -15,33 +15,29 @@ Here is a table with the title, genre, description, actors, year, and runtime
         </tr>
     </thead>
     <tbody>
-    <% for (let i = 0; i < movies.length; i++) { %>
-        <!-- fixing the issue regarding doubling the data -->
-        <% if(i % 2 == 1) { %>
-            <% movie = movies[i]; %>
-            <tr class="mb-2"> 
-                <td>
-                    <a href="/movies/show/<%=movie._id %>">
-                    <strong><%= movie['Title'] %></strong>
-                    </a>
-                </td>
-                <td>
-                    <% const genre = movie['Genre'].split(","); %>
-                    <% for(let j = 0; j < genre.length; j++) { %>
-                        <% if(j != genre.length - 1) { %>
-                            <%= genre[j] + ", " %>
-                        <% } %>
-                        <% if(j == genre.length - 1) { %>
-                            <%= genre[j] %>
-                        <% } %>
+    <% for (movie of movies) { %>
+        <tr class="mb-2"> 
+            <td>
+                <a href="/movies/show/<%=movie._id %>">
+                <strong><%= movie['Title'] %></strong>
+                </a>
+            </td>
+            <td>
+                <% const genre = movie['Genre'].split(","); %>
+                <% for(let j = 0; j < genre.length; j++) { %>
+                    <% if(j != genre.length - 1) { %>
+                        <%= genre[j] + ", " %>
                     <% } %>
-                </td>
-                <td><%= movie['Description'] %></td>
-                <td><%= movie['Actors'] %></td>
-                <td><%= movie['Year'] %></td>
-                <td><%= movie['Runtime'] %></td>
+                    <% if(j == genre.length - 1) { %>
+                        <%= genre[j] %>
+                    <% } %>
+                <% } %>
+            </td>
+            <td><%= movie['Description'] %></td>
+            <td><%= movie['Actors'] %></td>
+            <td><%= movie['Year'] %></td>
+            <td><%= movie['Runtime'] %></td>
             </tr>
-        <%  } %>
     <% } %>
     </tbody>
 </table>

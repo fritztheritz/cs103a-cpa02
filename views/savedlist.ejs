@@ -1,14 +1,38 @@
-<ul>
-	<% for (movie of movies){%>
-	    <li> 
-		<a href="/movies/remove/<%= movie._id %>">X</a>
-		<%= movie['Title'] %>
-		<%= movie.Genre %>
-		<%= movie.Description %>
-		<%= movie.Actors %>
-		<%= movie.Year %>
-		<%= movie.Runtime %>
-	    </li>
-	<% } %>
-    </ul>
-    
+<h2 style="text-align: center;"><strong>Saved Movies</strong></h2>
+<hr>
+<% for (movie of movies){%>
+	<div class="bg-light m-5 p-2 border border-primary border-2 center" style="text-align: center; width: 50%;">
+		<div class="">
+			<strong><%= movie.Title %></strong> 
+			<br>
+			<strong>Description: </strong> <%= movie.Description %>
+		</div>
+		<div class="mb-1">
+			<strong>Genre(s): </strong>
+			<% const genre = movie['Genre'].split(","); %>
+			<% for(let j = 0; j < genre.length; j++) { %>
+				<% if(j != genre.length - 1) { %>
+				<%= genre[j] + ", " %>
+				<% } %>
+				<% if(j == genre.length - 1) { %>
+				<%= genre[j] %>
+				<% } %>
+			<% } %>
+		</div>
+		<div></div>
+		<div class="mb-1">
+			<strong>Year: </strong> <%=movie.Year %>,
+			<strong>Runtime: </strong> <%=movie.Runtime %> minutes,
+			<strong>Rating: </strong><%= movie.Rating %> / 10
+		</div>
+		<div class="mb-1">
+			<strong>Actors: </strong> <%=movie.Actors %> <br>
+			<strong>Director: </strong> <%=movie.Director %> <br>
+			<strong>Revenue: </strong> 
+			<% let format = new Intl.NumberFormat('en-US'); %> 
+			$<%= format.format(movie.Revenue * 1000000); %> 
+		</div>
+		<a href="/movies/remove/<%= movie._id %>" style="margin-right: 10px;">(remove from saved list)</a>
+	</div>
+	
+<% } %>

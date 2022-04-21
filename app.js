@@ -18,16 +18,12 @@ const axios = require("axios")
 // *********************************************************** //
 //  Loading models
 // *********************************************************** //
-const ToDoItem = require("./models/ToDoItem")
-const Course = require('./models/Course')
-const Schedule = require('./models/Schedule')
 const Movie = require('./models/Movie')
 const SavedMovies = require('./models/SavedMovies')
 
 // *********************************************************** //
 //  Loading JSON datasets
 // *********************************************************** //
-const courses = require('./public/data/courses20-21.json')
 const movies = require('./public/data/movies.json')
 
 
@@ -118,142 +114,25 @@ app.get("/about", (req, res, next) => {
 });
 
 
-
-/*
-    ToDoList routes
-*/
-app.get('/todo',
-    isLoggedIn, // redirect to /login if user is not logged in
-    async(req, res, next) => {
-        try {
-            let userId = res.locals.user._id; // get the user's id
-            let items = await ToDoItem.find({ userId: userId }); // lookup the user's todo items
-            res.locals.items = items; //make the items available in the view
-            res.render("toDo"); // render to the toDo page
-        } catch (e) {
-            next(e);
-        }
-    }
-)
-
-app.post('/todo/add',
-    isLoggedIn,
-    async(req, res, next) => {
-        try {
-            const { title, description } = req.body; // get title and description from the body
-            const userId = res.locals.user._id; // get the user's id
-            const createdAt = new Date(); // get the current date/time
-            let data = { title, description, userId, createdAt, } // create the data object
-            let item = new ToDoItem(data) // create the database object (and test the types are correct)
-            await item.save() // save the todo item in the database
-            res.redirect('/todo') // go back to the todo page
-        } catch (e) {
-            next(e);
-        }
-    }
-)
-
-app.get("/todo/delete/:itemId",
-    isLoggedIn,
-    async(req, res, next) => {
-        try {
-            const itemId = req.params.itemId; // get the id of the item to delete
-            await ToDoItem.deleteOne({ _id: itemId }) // remove that item from the database
-            res.redirect('/todo') // go back to the todo page
-        } catch (e) {
-            next(e);
-        }
-    }
-)
-
-app.get("/todo/completed/:value/:itemId",
-    isLoggedIn,
-    async(req, res, next) => {
-        try {
-            const itemId = req.params.itemId; // get the id of the item to delete
-            const completed = req.params.value == 'true';
-            await ToDoItem.findByIdAndUpdate(itemId, { completed }) // remove that item from the database
-            res.redirect('/todo') // go back to the todo page
-        } catch (e) {
-            next(e);
-        }
-    }
-)
-
-
-
 /* ************************
   Loading (or reloading) the data into a collection
    ************************ */
-// this route loads in the courses into the Course collection
-// or updates the courses if it is not a new collection
-
-// app.get('/upsertDB',
-//     async(req, res, next) => {
-//         //await Course.deleteMany({})
-//         for (course of courses) {
-//             const { subject, coursenum, section, term } = course;
-//             const num = getNum(coursenum);
-//             course.num = num
-//             course.suffix = coursenum.slice(num.length)
-//             course.strTimes = times2str(course.times)
-//             await Course.findOneAndUpdate({ subject, coursenum, section, term }, course, { upsert: true })
-//         }
-//         const num = await Course.find({}).count();
-//         res.send("data uploaded: " + num)
-//     }
-// )
-
-// app.post('/courses/bySubject',
-//     // show list of courses in a given subject
-//     async(req, res, next) => {
-//         const { subject } = req.body;
-//         const courses = await Course.find({ subject: subject, independent_study: false }).sort({ term: 1, num: 1, section: 1 })
-
-//         res.locals.courses = courses
-//         res.locals.strTimes = courses.strTimes
-//             //res.json(courses)
-//         res.render('courselist')
-//     }
-// )
-
-// app.get('/courses/show/:courseId',
-//     // show all info about a course given its courseid
-//     async(req, res, next) => {
-//         const { courseId } = req.params;
-//         const course = await Course.findOne({ _id: courseId })
-//         res.locals.course = course
-//         res.locals.strTimes = courses.strTimes
-//             //res.json(course)
-//         res.render('course')
-//     }
-// )
 
 app.get('/upsertDB',
     async(req, res, next) => {
-        //await Course.deleteMany({})
+        await Movie.deleteMany({})
         for (movie of movies) {
-            const { Title, Genre, Description, Actors, Runtime} = movie;
-            await Movie.findOneAndUpdate({ Title, Genre, Description, Actors, Runtime }, movie, { upsert: true })
+            const { Title, Genre, Description, Actors, Runtime, Revenue} = movie;
+            await Movie.findOneAndUpdate({ Title, Genre, Description, Actors, Runtime, Revenue }, movie, { upsert: true })
         }
         const num = await Movie.find({}).count();
         res.send("data uploaded: " + num)
     }
 )
 
-app.get('/movies/title/:name',
-    // show a list of all courses taught by a given faculty
-    async(req, res, next) => {
-        const name = req.params.name;
-        const movies = await Movie.find({title: name})
-            //res.json(courses)
-        res.locals.movies = movies
-        res.render('movielist')
-    }
-)
 
 app.post('/movies/title',
-    // show courses taught by a faculty send from a form
+    // show movies with a certain string in the title
     async(req, res, next) => {
         const { title } = req.body;
         console.log(title);
@@ -268,7 +147,7 @@ app.post('/movies/title',
 )
 
 app.post('/movies/actor',
-    // show courses taught by a faculty send from a form
+    // show movies with a certain actor in the list of actors
     async(req, res, next) => {
         const { actor } = req.body;
         console.log(actor);
@@ -283,7 +162,7 @@ app.post('/movies/actor',
 )
 
 app.post('/movies/genre',
-    // show courses taught by a faculty send from a form
+    // show movies with a certain genre in the list of genres
     async(req, res, next) => {
         const { genre } = req.body;
         console.log(genre);
@@ -307,19 +186,6 @@ app.get('/movies/show/:movieId',
         res.render('movie')
     }
 )
-
-// app.post('/courses/byKeyword',
-//     // show list of courses in a given subject
-//     async(req, res, next) => {
-//         const { keyword } = req.body;
-//         var regex = new RegExp(keyword, "gi")
-//         const courses = await Course.find({name: regex}, {independent_study: false }).sort({ term: 1, num: 1, section: 1 })
-//         res.locals.courses = courses
-//         res.locals.strTimes = courses.strTimes
-//             //res.json(courses)
-//         res.render('courselist')
-//     }
-// )
 
 app.use(isLoggedIn)
 

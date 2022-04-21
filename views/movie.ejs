@@ -1,8 +1,13 @@
+<h2 style="text-align: center;"><strong>Movie Information</strong></h2>
+<hr>
 <div class="bg-light m-5 p-2 border border-primary border-2 center" style="text-align: center; width: 50%;">
 	<div class="">
-	    <strong><%= movie.Title %></strong>
+	    <strong><%= movie.Title %></strong> 
+	    <br>
+	    <strong>Description: </strong> <%= movie.Description %>
 	</div>
 	<div class="mb-1">
+		<strong>Genre(s): </strong>
 		<% const genre = movie['Genre'].split(","); %>
 		<% for(let j = 0; j < genre.length; j++) { %>
 		    <% if(j != genre.length - 1) { %>
@@ -13,11 +18,19 @@
 		    <% } %>
 		<% } %>
 	</div>
-	<div><a href="/addMovie/<%= movie['_id'] %>">(add to saved list)</a></div>
+	<div></div>
 	<div class="mb-1">
-	   Year: <%=movie.Year %>,
-	   Runtime: <%=movie.Runtime %> minutes,
-	   Rating: <%= movie.Rating %> / 10
+		<strong>Year: </strong> <%=movie.Year %>,
+		<strong>Runtime: </strong> <%=movie.Runtime %> minutes,
+		<strong>Rating: </strong><%= movie.Rating %> / 10
 	</div>
-    </div>
-    <hr>
+	<div class="mb-1">
+		<strong>Actors: </strong> <%=movie.Actors %> <br>
+		<strong>Director: </strong> <%=movie.Director %> <br>
+		<strong>Revenue: </strong> 
+		<% let format = new Intl.NumberFormat('en-US'); %> 
+		$<%= format.format(movie.Revenue * 1000000); %> 
+	</div>
+	<a href="/addMovie/<%= movie['_id'] %>">(add to saved list)</a>
+</div>
+
