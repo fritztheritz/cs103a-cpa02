@@ -31,6 +31,6 @@
 		<% let format = new Intl.NumberFormat('en-US'); %> 
 		$<%= format.format(movie.Revenue * 1000000); %> 
 	</div>
-	<a href="/addMovie/<%= movie['_id'] %>">(add to saved list)</a>
+	<a href="/addMovie/<%= movie['_id'] %>"><strong>(add to saved list)</strong></a>
 </div>
 

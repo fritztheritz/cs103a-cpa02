@@ -32,7 +32,7 @@
 			<% let format = new Intl.NumberFormat('en-US'); %> 
 			$<%= format.format(movie.Revenue * 1000000); %> 
 		</div>
-		<a href="/movies/remove/<%= movie._id %>" style="margin-right: 10px;">(remove from saved list)</a>
+		<a href="/movies/remove/<%= movie._id %>" style="margin-right: 10px;"><strong>(remove from saved list)</strong></a>
 	</div>
 	
 <% } %>

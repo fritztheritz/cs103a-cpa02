@@ -135,13 +135,8 @@ app.post('/movies/title',
     // show movies with a certain string in the title
     async(req, res, next) => {
         const { title } = req.body;
-        console.log(title);
-        console.log(typeof title);
         const movies = await Movie.find({Title: {$regex: title}}).sort({Title: 1})
-        // res.json(movies)
         res.locals.movies = movies
-        console.log(movies);
-        // console.log(typeof movies);
         res.render('movielist', {movies: movies})
     }
 )
@@ -150,13 +145,9 @@ app.post('/movies/actor',
     // show movies with a certain actor in the list of actors
     async(req, res, next) => {
         const { actor } = req.body;
-        console.log(actor);
-        console.log(typeof actor);
         const movies = await Movie.find({Actors: {$regex: actor}}).sort({Title: 1})
         // res.json(movies)
         res.locals.movies = movies
-        console.log(movies);
-        // console.log(typeof movies);
         res.render('movielist', {movies: movies})
     }
 )
@@ -165,13 +156,8 @@ app.post('/movies/genre',
     // show movies with a certain genre in the list of genres
     async(req, res, next) => {
         const { genre } = req.body;
-        console.log(genre);
-        console.log(typeof genre);
         const movies = await Movie.find({Genre: {$regex: genre}}).sort({Title: 1})
-        // res.json(movies)
         res.locals.movies = movies
-        console.log(movies);
-        // console.log(typeof movies);
         res.render('movielist', {movies: movies})
     }
 )
@@ -182,7 +168,6 @@ app.get('/movies/show/:movieId',
         const { movieId } = req.params;
         const movie = await Movie.findOne({ _id: movieId })
         res.locals.movie = movie
-            //res.json(course)
         res.render('movie')
     }
 )
@@ -190,7 +175,7 @@ app.get('/movies/show/:movieId',
 app.use(isLoggedIn)
 
 app.get('/movies/saved',
-    // show the current user's schedule
+    // show the current user's saved movies
     async(req, res, next) => {
         try {
             const userId = res.locals.user._id;
@@ -206,7 +191,7 @@ app.get('/movies/saved',
 )
 
 app.get('/movies/remove/:movieid',
-    // remove a course from the user's schedule
+    // remove a movie from the user's saved list
     async(req, res, next) => {
         try {
             await SavedMovies.remove({
@@ -222,7 +207,7 @@ app.get('/movies/remove/:movieid',
 )
 
 app.get('/addMovie/:movieid',
-    // add a course to the user's schedule
+    // add a movie to the user's saved list
     async(req, res, next) => {
         try {
             const movieId = req.params.movieid
@@ -239,56 +224,7 @@ app.get('/addMovie/:movieid',
         }
     })
 
-// app.get('/addCourse/:courseId',
-//     // add a course to the user's schedule
-//     async(req, res, next) => {
-//         try {
-//             const courseId = req.params.courseId
-//             const userId = res.locals.user._id
-//                 // check to make sure it's not already loaded
-//             const lookup = await Schedule.find({ courseId, userId })
-//             if (lookup.length == 0) {
-//                 const schedule = new Schedule({ courseId, userId })
-//                 await schedule.save()
-//             }
-//             res.redirect('/schedule/show')
-//         } catch (e) {
-//             next(e)
-//         }
-//     })
 
-// app.get('/schedule/show',
-//     // show the current user's schedule
-//     async(req, res, next) => {
-//         try {
-//             const userId = res.locals.user._id;
-//             const courseIds =
-//                 (await Schedule.find({ userId }))
-//                 .sort(x => x.term)
-//                 .map(x => x.courseId)
-//             res.locals.courses = await Course.find({ _id: { $in: courseIds } })
-//             res.render('schedule')
-//         } catch (e) {
-//             next(e)
-//         }
-//     }
-// )
-
-// app.get('/schedule/remove/:courseId',
-//     // remove a course from the user's schedule
-//     async(req, res, next) => {
-//         try {
-//             await Schedule.remove({
-//                 userId: res.locals.user._id,
-//                 courseId: req.params.courseId
-//             })
-//             res.redirect('/schedule/show')
-
-//         } catch (e) {
-//             next(e)
-//         }
-//     }
-// )
 
 
 // here we catch 404 errors and forward to error handler
