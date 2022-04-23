@@ -163,7 +163,7 @@ app.post('/movies/genre',
 )
 
 app.get('/movies/show/:movieId',
-    // show all info about a course given its courseid
+    // show all info about a movie given its movieid
     async(req, res, next) => {
         const { movieId } = req.params;
         const movie = await Movie.findOne({ _id: movieId })
