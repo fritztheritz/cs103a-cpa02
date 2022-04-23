@@ -14,3 +14,9 @@ a {
   left: 22%;
   /* transform: translate(0, -50%); */
 }
+
+.right-side{
+  position: absolute;
+  top: 11%;
+  left: 87%;
+}

@@ -190,6 +190,71 @@ app.get('/movies/saved',
     }
 )
 
+app.get('/movies/saved/title',
+    // show the current user's saved movies (sorted by title)
+    async(req, res, next) => {
+        try {
+            const userId = res.locals.user._id;
+            const movieIds =
+                (await SavedMovies.find({ userId }))
+                .map(x => x.movieId)
+            res.locals.movies = await Movie.find({ _id: { $in: movieIds } }).sort({Title: 1})
+            res.render('savedlist')
+        } catch (e) {
+            next(e)
+        }
+    }
+)
+
+app.get('/movies/saved/rating',
+    // show the current user's saved movies (sorted by rating)
+    async(req, res, next) => {
+        try {
+            const userId = res.locals.user._id;
+            const movieIds =
+                (await SavedMovies.find({ userId }))
+                .map(x => x.movieId)
+            res.locals.movies = await Movie.find({ _id: { $in: movieIds } }).sort({Rating: -1, Title: 1})
+            res.render('savedlist')
+        } catch (e) {
+            next(e)
+        }
+    }
+)
+
+app.get('/movies/saved/year',
+    // show the current user's saved movies (sorted by year)
+    async(req, res, next) => {
+        try {
+            const userId = res.locals.user._id;
+            const movieIds =
+                (await SavedMovies.find({ userId }))
+                .map(x => x.movieId)
+            res.locals.movies = await Movie.find({ _id: { $in: movieIds } }).sort({Year: 1, Title: 1})
+            res.render('savedlist')
+        } catch (e) {
+            next(e)
+        }
+    }
+)
+
+app.get('/movies/saved/runtime',
+    // show the current user's saved movies (sorted by runtime)
+    async(req, res, next) => {
+        try {
+            const userId = res.locals.user._id;
+            const movieIds =
+                (await SavedMovies.find({ userId }))
+                .map(x => x.movieId)
+            res.locals.movies = await Movie.find({ _id: { $in: movieIds } }).sort({Runtime: 1, Title: 1})
+            res.render('savedlist')
+        } catch (e) {
+            next(e)
+        }
+    }
+)
+
+
 app.get('/movies/remove/:movieid',
     // remove a movie from the user's saved list
     async(req, res, next) => {

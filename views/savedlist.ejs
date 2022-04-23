@@ -1,5 +1,18 @@
+
 <h2 style="text-align: center;"><strong>Saved Movies</strong></h2>
 <hr>
+<div class="btn-group right-side">
+	<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #CFF0CC; color: black;">
+	  <strong>Sort By</strong>
+	</button>
+	<div class="dropdown-menu">
+		<a class="dropdown-item" href="/movies/saved/title">Title</a>
+		<a class="dropdown-item" href="/movies/saved/rating">Rating</a>
+		<a class="dropdown-item" href="/movies/saved/year">Year</a>
+		<a class="dropdown-item" href="/movies/saved/runtime">Runtime</a>
+	</div>
+</div>
+
 <% for (movie of movies){%>
 	<div class="bg-light m-5 p-2 border border-primary border-2 center" style="text-align: center; width: 50%;">
 		<div class="">
@@ -23,7 +36,7 @@
 		<div class="mb-1">
 			<strong>Year: </strong> <%=movie.Year %>,
 			<strong>Runtime: </strong> <%=movie.Runtime %> minutes,
-			<strong>Rating: </strong><%= movie.Rating %> / 10
+			<strong>Rating: </strong><%= movie.Rating %>/10
 		</div>
 		<div class="mb-1">
 			<strong>Actors: </strong> <%=movie.Actors %> <br>
