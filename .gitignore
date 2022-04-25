@@ -2,3 +2,4 @@
 node_modules
 .icloud
 *.env
+startup.sh
