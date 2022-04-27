@@ -8,6 +8,10 @@ This is where the movie finder comes in. If you need a little help finding a mov
 This is a starter project which has a simple authentication module 
 and provides access to a mongoose database in the cloud.
 
+## How The App Works
+
+
+
 ## Installation
 Download the project from github and download nodejs and npm from https://nodejs.org
 and cd into the folder
