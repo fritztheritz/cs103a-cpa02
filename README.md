@@ -1,6 +1,8 @@
-# CS103a_PA03
+# CS103a_CPA02: Movie Finder App
 
-Much of today's software development involves working database-backed responsive interactive web applications. Having an experience modifying such a website using Express/Mongoose/EJS will make it easier to understand similar frameworks and to jump into a full-stack web development project.  Most web apps these days use a front end framework too (e.g. React, ReactNative, Angular), but even these are based on HTML and have a CSS Bootstrap-like styling feature.  Working with this PA will help you on CPA02 where you need to build on this code base and build something interesting demonstrating your mastery of the core full-stack skills and your ability to learn new techniques on your own.
+Sometimes, it gets difficult to find a movie that you want to watch.
+You get stuck thinking about what could be a good option, and sometimes, even have too many options that you forget them all.
+This is where the movie finder comes in. If you need a little help finding a movie to watch, you can use the search bars on the home page to find a movie to watch, click on the movie link, and save it to your saved list. From there, you can access your saved list and choose which onne you want to watch, and then delete it from your saved list when you are done :D
 
 
 This is a starter project which has a simple authentication module 
