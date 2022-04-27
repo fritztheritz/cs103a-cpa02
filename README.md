@@ -27,7 +27,7 @@ When you click on the link from the search page, it will bring you to a page tha
 When you save a movie or press the "Show Saved Movies" button in the header (appears when logged in), you can see your saved movie list and sort this list by title, rating, year, or runtime and it will refresh the page and sort your movies. You can also delete a movie from your list with the "remove from saved list."
 
 ## Zoom Link
-*put link here*
+https://brandeis.zoom.us/rec/share/o_oGog6-f2CKO6YvYVNWeV-syQNV1JmM6ofctSswpnc1QUsDMXkhgD29HggKNwrb.tjapWoqi8uvcDnxY?startTime=1651092163000
 
 ## Installation
 Download the project from github and download nodejs and npm from https://nodejs.org
